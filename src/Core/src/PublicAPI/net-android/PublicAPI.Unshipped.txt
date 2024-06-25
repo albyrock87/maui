@@ -66,6 +66,8 @@ override Microsoft.Maui.Handlers.ShapeViewHandler.GetDesiredSize(double widthCon
 override Microsoft.Maui.Layouts.FlexBasis.Equals(object? obj) -> bool
 override Microsoft.Maui.Layouts.FlexBasis.GetHashCode() -> int
 override Microsoft.Maui.MauiAppCompatActivity.DispatchTouchEvent(Android.Views.MotionEvent? e) -> bool
+override Microsoft.Maui.Platform.ContentViewGroup.Background.get -> Android.Graphics.Drawables.Drawable?
+override Microsoft.Maui.Platform.ContentViewGroup.Background.set -> void
 override Microsoft.Maui.PlatformAppCompatTextView.JniPeerMembers.get -> Java.Interop.JniPeerMembers!
 override Microsoft.Maui.PlatformAppCompatTextView.ThresholdClass.get -> nint
 override Microsoft.Maui.PlatformAppCompatTextView.ThresholdType.get -> System.Type!
@@ -144,6 +146,8 @@ virtual Microsoft.Maui.Handlers.ButtonHandler.ImageSourceLoader.get -> Microsoft
 virtual Microsoft.Maui.Handlers.ImageButtonHandler.SourceLoader.get -> Microsoft.Maui.Platform.ImageSourcePartLoader!
 virtual Microsoft.Maui.Handlers.ImageHandler.SourceLoader.get -> Microsoft.Maui.Platform.ImageSourcePartLoader!
 virtual Microsoft.Maui.Handlers.SwipeItemMenuItemHandler.SourceLoader.get -> Microsoft.Maui.Platform.ImageSourcePartLoader!
+~override Microsoft.Maui.Platform.WrapperView.Background.get -> Android.Graphics.Drawables.Drawable
+~override Microsoft.Maui.Platform.WrapperView.Background.set -> void
 ~override Microsoft.Maui.Platform.WrapperView.DrawShadow(Android.Graphics.Canvas canvas, int viewWidth, int viewHeight) -> void
 ~override Microsoft.Maui.Platform.WrapperView.GetClipPath(int width, int height) -> Android.Graphics.Path
 *REMOVED*override Microsoft.Maui.Animations.PlatformTicker.SystemEnabled.get -> bool

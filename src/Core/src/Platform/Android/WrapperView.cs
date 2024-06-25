@@ -2,6 +2,7 @@
 using System;
 using Android.Content;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Views;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Graphics.Platform;
@@ -24,6 +25,18 @@ namespace Microsoft.Maui.Platform
 		bool _invalidateShadow;
 
 		AView _borderView;
+		
+		Drawable _background;
+
+		public override Drawable Background
+		{
+			get => _background;
+			set
+			{
+				_background = value;
+				base.Background = value;
+			}
+		}
 
 		public bool InputTransparent { get; set; }
 

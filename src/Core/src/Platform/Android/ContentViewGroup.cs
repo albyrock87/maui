@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.Content;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
@@ -13,6 +14,18 @@ namespace Microsoft.Maui.Platform
 	{
 		IBorderStroke? _clip;
 		readonly Context _context;
+		
+		Drawable? _background;
+
+		public override Drawable? Background
+		{
+			get => _background;
+			set
+			{
+				_background = value;
+				base.Background = value;
+			}
+		}
 
 		public ContentViewGroup(Context context) : base(context)
 		{
