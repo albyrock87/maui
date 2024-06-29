@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Maui.Handlers.Layout;
 using ObjCRuntime;
 using UIKit;
 using PlatformView = UIKit.UIView;
@@ -34,8 +35,18 @@ namespace Microsoft.Maui.Handlers
 			// Remove any previous children 
 			PlatformView.ClearSubviews();
 
-			foreach (var child in VirtualView.OrderByZIndex())
+			foreach (var child in VirtualView.EnumeratePlatformChildren())
 			{
+				if (child is IHeadlessLayout { IsHeadless: true } headlessLayout)
+				{
+					// TODO: move to extension method
+					// TODO: handle disconnect (do we really need to?)
+					var headlessLayoutHandler = new HeadlessLayoutHandler(PlatformView, headlessLayout);
+					headlessLayoutHandler.SetMauiContext(MauiContext);
+					headlessLayout.Handler = headlessLayoutHandler;
+					continue;
+				}
+				
 				PlatformView.AddSubview(child.ToPlatform(MauiContext));
 			}
 		}

@@ -1,11 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.Maui.Handlers
 {
 	internal static class LayoutExtensions
 	{
-		public static IOrderedEnumerable<IView> OrderByZIndex(this ILayout layout) => layout.OrderBy(v => v.ZIndex);
+		public static IEnumerable<IView> EnumeratePlatformChildren(this ILayout layout)
+		{
+			foreach (var view in layout.OrderByZIndex())
+			{
+				yield return view;
+				
+				if (view is IHeadlessLayout { IsHeadless: true } headlessLayout)
+				{
+					foreach (var child in headlessLayout.EnumeratePlatformChildren())
+					{
+						yield return child;
+					}
+				}
+			}
+		}
+		
+		public static IOrderedEnumerable<IView> OrderByZIndex(this ILayout layout)
+		{
+			return layout.OrderBy(v => v.ZIndex);
+		}
 
 		public static int GetLayoutHandlerIndex(this ILayout layout, IView view)
 		{
