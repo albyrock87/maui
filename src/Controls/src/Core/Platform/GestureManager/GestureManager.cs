@@ -56,6 +56,12 @@ namespace Microsoft.Maui.Controls.Platform
 
 		void SetupGestureManager()
 		{
+			if (_view is IHeadlessLayout { IsHeadless: true })
+			{
+				// Headless layouts don't have a view to attach gestures to
+				return;
+			}
+			
 			var handler = _view.Handler;
 
 			if (handler == null ||

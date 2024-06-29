@@ -4,8 +4,8 @@
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <ScrollView Padding="{OnPlatform iOS='30,60,30,30', Default='30'}">
-        <StackLayout>
-            <Grid RowSpacing="25" RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <VerticalStackLayout>
+            <Grid RowSpacing="25" CompressedLayout.IsHeadless="True" RowDefinitions="Auto,Auto,Auto,Auto,*">
 
                 <Label Text="Hello, World!"
                     Grid.Row="0"
@@ -41,7 +41,7 @@
                     HorizontalOptions="Center" />
 
             </Grid>
-        </StackLayout>
+        </VerticalStackLayout>
     </ScrollView>
 
 </ContentPage>

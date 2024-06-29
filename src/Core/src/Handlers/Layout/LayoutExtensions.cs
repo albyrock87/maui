@@ -1,11 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.Maui.Handlers
 {
 	internal static class LayoutExtensions
 	{
-		public static IOrderedEnumerable<IView> OrderByZIndex(this ILayout layout) => layout.OrderBy(v => v.ZIndex);
+		public static IEnumerable<IView> EnumeratePlatformChildren(this ILayout layout)
+		{
+			foreach (var view in layout.OrderByZIndex())
+			{
+				yield return view;
+				
+				if (view is IHeadlessLayout { IsHeadless: true } headlessLayout)
+				{
+					foreach (var child in headlessLayout.EnumeratePlatformChildren())
+					{
+						yield return child;
+					}
+				}
+			}
+		}
+		
+		public static IOrderedEnumerable<IView> OrderByZIndex(this ILayout layout)
+		{
+			return layout.OrderBy(v => v.ZIndex);
+		}
 
 		public static int GetLayoutHandlerIndex(this ILayout layout, IView view)
 		{
@@ -33,12 +53,31 @@ namespace Microsoft.Maui.Handlers
 
 						if (childZIndex < zIndex || !found && childZIndex == zIndex)
 						{
-							++lowerViews;
+							lowerViews = child is IHeadlessLayout { IsHeadless: true } headlessChild
+								? lowerViews + headlessChild.GetHeadlessDescendantCount()
+								: lowerViews + 1;
 						}
 					}
 
 					return found ? lowerViews : -1;
 			}
+		}
+
+		private static int GetHeadlessDescendantCount(this IHeadlessLayout headlessLayout)
+		{
+			var count = 0;
+			foreach (var child in headlessLayout)
+			{
+				if (child is IHeadlessLayout { IsHeadless: true } headlessChild)
+				{
+					count += headlessChild.GetHeadlessDescendantCount();
+				}
+				else
+				{
+					count++;
+				}
+			}
+			return count;
 		}
 	}
 }
