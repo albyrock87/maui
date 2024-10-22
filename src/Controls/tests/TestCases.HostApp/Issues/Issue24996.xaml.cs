@@ -1,8 +1,17 @@
 namespace Maui.Controls.Sample.Issues;
 
-[Issue(IssueTracker.Github, 24996, "Translation causes multiple layout passes", PlatformAffected.All)]
+[Issue(IssueTracker.Github, 24996, "Changing Translation of an element causes Maui in iOS to constantly run Measure & ArrangeChildren", PlatformAffected.All)]
 public partial class Issue24996 : ContentPage
 {
+	Point[] _translations = [
+		new(20, 20),
+		new(1000, 20),
+		new(20, 1000),
+		new(1000, 1000),
+	];
+
+	int _index = -1;
+
 	public Issue24996()
 	{
 		InitializeComponent();
@@ -32,9 +41,11 @@ public partial class Issue24996 : ContentPage
 
 	public async void OnTapped(object sender, EventArgs e)
 	{
-		Lvl2.TranslationY = Random.Shared.Next(0, (int)Height);
-		Lvl2.TranslationX = Random.Shared.Next(0, (int)Width);
-		await Task.Delay(500);
+		var testPoint = _translations[++_index % _translations.Length];
+		Coords.Text = $"X: {testPoint.X}, Y: {testPoint.Y}";
+		Lvl2.TranslationX = testPoint.X;
+		Lvl2.TranslationY = testPoint.Y;
+		await Task.Delay(100);
 		UpdateText();
 	}
 

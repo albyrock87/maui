@@ -19,13 +19,19 @@
         </issues:ObservedLayout24996>
         </issues:ObservedLayout24996>
       </issues:ObservedLayout24996>
-    <Label x:Name="Stats" 
-           AutomationId="Stats"
-           HeightRequest="80"
-           WidthRequest="{Binding Width, Source={x:Reference Root}}"
-           AbsoluteLayout.LayoutFlags="PositionProportional"
-           AbsoluteLayout.LayoutBounds="0,1,-1,-1"
-           BackgroundColor="#222222"
-           TextColor="White"/>
+    <VerticalStackLayout AbsoluteLayout.LayoutFlags="PositionProportional"
+                         AbsoluteLayout.LayoutBounds="0,1,-1,-1"
+                         BackgroundColor="#222222">
+      <Label x:Name="Coords"
+             HeightRequest="40"
+             WidthRequest="{Binding Width, Source={x:Reference Root}}"
+             AutomationId="Coords"
+             TextColor="White"/>
+      <Label x:Name="Stats"
+             HeightRequest="40"
+             WidthRequest="{Binding Width, Source={x:Reference Root}}"
+             AutomationId="Stats"
+             TextColor="White"/>
+    </VerticalStackLayout>
   </issues:ObservedLayout24996>
 </ContentPage>
