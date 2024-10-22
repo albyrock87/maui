@@ -2280,7 +2280,6 @@ override Microsoft.Maui.Platform.PlatformTouchGraphicsView.TouchesEnded(Foundati
 override Microsoft.Maui.Platform.PlatformTouchGraphicsView.TouchesMoved(Foundation.NSSet! touches, UIKit.UIEvent? evt) -> void
 override Microsoft.Maui.Platform.WrapperView.LayoutSubviews() -> void
 override Microsoft.Maui.Platform.WrapperView.MovedToWindow() -> void
-override Microsoft.Maui.Platform.WrapperView.SetNeedsLayout() -> void
 override Microsoft.Maui.Platform.WrapperView.SizeThatFits(CoreGraphics.CGSize size) -> CoreGraphics.CGSize
 override Microsoft.Maui.RectangleGridAdorner.Draw(Microsoft.Maui.Graphics.ICanvas! canvas, Microsoft.Maui.Graphics.RectF dirtyRect) -> void
 override Microsoft.Maui.Semantics.ToString() -> string!

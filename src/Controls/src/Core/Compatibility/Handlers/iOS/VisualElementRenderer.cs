@@ -1,14 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using Microsoft.Maui.Controls.Platform;
-using Microsoft.Maui.Graphics;
 using UIKit;
 
 namespace Microsoft.Maui.Controls.Handlers.Compatibility
 {
-	public abstract partial class VisualElementRenderer<TElement> : UIView, IPlatformViewHandler, IElementHandler
+	public abstract partial class VisualElementRenderer<TElement> : UIView, IPlatformViewHandler, IElementHandler, IMauiPlatformLayout
 		where TElement : Element, IView
 	{
+		bool _invalidateParentWhenMovedToWindow;
 		object? IElementHandler.PlatformView => Subviews.Length > 0 ? Subviews[0] : this;
 
 		public virtual UIViewController? ViewController => null;
@@ -89,6 +89,21 @@ namespace Microsoft.Maui.Controls.Handlers.Compatibility
 		void OnSizeChanged(object? sender, EventArgs e)
 		{
 			UpdateNativeWidget();
+		}
+
+		void IMauiPlatformLayout.InvalidateAncestorsMeasuresWhenMovedToWindow()
+		{
+			_invalidateParentWhenMovedToWindow = true;
+		}
+
+		public override void MovedToWindow()
+		{
+			base.MovedToWindow();
+			if (_invalidateParentWhenMovedToWindow)
+			{
+				_invalidateParentWhenMovedToWindow = false;
+				this.InvalidateAncestorsMeasures();
+			}
 		}
 	}
 }
