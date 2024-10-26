@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CoreAnimation;
-using CoreGraphics;
 using Microsoft.Maui.Graphics;
 using UIKit;
 
@@ -101,11 +99,21 @@ namespace Microsoft.Maui.Platform
 
 			platformView.UpdateMauiCALayer(border);
 		}
+
+		internal static void DisconnectMauiCALayer(this UIView platformView)
+		{
+			if ((platformView.Layer as MauiCALayer ?? platformView.Layer?.Sublayers?.FirstOrDefault(x => x is MauiCALayer)) is MauiCALayer backgroundLayer)
+			{
+				backgroundLayer.Initialized = false;
+			}
+		}
+
 		internal static void UpdateMauiCALayer(this UIView platformView, IBorderStroke? border)
 		{
+			var handlerState = ElementHandlerExtensions.GetHandlerStateOrDefault(border);
+
 			CALayer? backgroundLayer = platformView.Layer as MauiCALayer;
 
-			var initialRender = false;
 			if (backgroundLayer == null)
 			{
 				backgroundLayer = platformView.Layer?.Sublayers?
@@ -113,7 +121,6 @@ namespace Microsoft.Maui.Platform
 
 				if (backgroundLayer == null)
 				{
-					initialRender = true;
 					backgroundLayer = new MauiCALayer
 					{
 						Name = ViewExtensions.BackgroundLayerName
@@ -124,15 +131,15 @@ namespace Microsoft.Maui.Platform
 				}
 			}
 
-			// While we're in the process of connecting the handler properties will not change
-			// So it's useless to update the layer many times with the same value
-			if (platformView is ContentView { View: null } && !initialRender)
-			{
-				return;
-			}
-
 			if (backgroundLayer is MauiCALayer mauiCALayer)
 			{
+				// While we're in the process of connecting the handler properties will not change
+				// So it's useless to update the layer many times with the same value
+				if (mauiCALayer.Initialized && handlerState.IsMappingProperties())
+				{
+					return;
+				}
+
 				if (border is IView view)
 					mauiCALayer.SetBackground(view.Background);
 				else
@@ -150,6 +157,8 @@ namespace Microsoft.Maui.Platform
 				}
 
 				mauiCALayer.SetBorderShape(border?.Shape);
+
+				mauiCALayer.Initialized = true;
 			}
 
 			if (platformView is ContentView contentView)

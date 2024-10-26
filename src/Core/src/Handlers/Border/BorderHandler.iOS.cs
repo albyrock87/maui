@@ -25,6 +25,7 @@ namespace Microsoft.Maui.Handlers
 			base.DisconnectHandler(platformView);
 
 			platformView.ClearSubviews();
+			platformView.DisconnectMauiCALayer();
 		}
 
 		public override void SetVirtualView(IView view)

@@ -2,7 +2,7 @@
 
 namespace Microsoft.Maui.Handlers
 {
-	public abstract partial class ElementHandler : IElementHandler
+	public abstract partial class ElementHandler : IElementHandler, IElementHandlerStateExhibitor
 	{
 		public static IPropertyMapper<IElement, IElementHandler> ElementMapper = new PropertyMapper<IElement, IElementHandler>()
 		{
@@ -12,6 +12,7 @@ namespace Microsoft.Maui.Handlers
 		{
 		};
 
+		ElementHandlerState _state;
 		internal readonly IPropertyMapper _defaultMapper;
 		internal readonly CommandMapper? _commandMapper;
 		internal IPropertyMapper _mapper;
@@ -23,6 +24,8 @@ namespace Microsoft.Maui.Handlers
 			_mapper = _defaultMapper;
 			_commandMapper = commandMapper;
 		}
+
+		ElementHandlerState IElementHandlerStateExhibitor.State => _state;
 
 		public IMauiContext? MauiContext { get; private set; }
 
@@ -47,7 +50,15 @@ namespace Microsoft.Maui.Handlers
 			bool setupPlatformView = oldVirtualView == null;
 
 			VirtualView = view;
-			PlatformView ??= CreatePlatformElement();
+			if (PlatformView is null)
+			{
+				_state = ElementHandlerState.Connecting;
+				PlatformView = CreatePlatformElement();
+			}
+			else
+			{
+				_state = ElementHandlerState.Reconnecting;
+			}
 
 			if (VirtualView.Handler != this)
 				VirtualView.Handler = this;
@@ -77,6 +88,8 @@ namespace Microsoft.Maui.Handlers
 			}
 
 			_mapper.UpdateProperties(this, VirtualView);
+
+			_state = ElementHandlerState.Connected;
 		}
 
 		public virtual void UpdateValue(string property)
@@ -128,6 +141,7 @@ namespace Microsoft.Maui.Handlers
 				var oldPlatformView = PlatformView;
 				PlatformView = null;
 				DisconnectHandler(oldPlatformView);
+				_state = ElementHandlerState.Disconnected;
 			}
 		}
 	}

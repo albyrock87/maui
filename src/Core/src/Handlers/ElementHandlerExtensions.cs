@@ -10,6 +10,7 @@ using PlatformView = Tizen.NUI.BaseComponents.View;
 using PlatformView = System.Object;
 #endif
 using System;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Handlers;
 using System.Threading.Tasks;
@@ -21,6 +22,14 @@ namespace Microsoft.Maui
 		internal static PlatformView ToPlatform(this IElementHandler elementHandler) =>
 			(elementHandler.VirtualView?.ToPlatform() as PlatformView) ??
 				throw new InvalidOperationException($"Unable to convert {elementHandler} to {typeof(PlatformView)}");
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static bool IsMappingProperties(this ElementHandlerState state)
+			=> state.HasFlag(ElementHandlerState.MappingProperties);
+
+		internal static ElementHandlerState GetHandlerStateOrDefault<T>(T? handlerOrElement, ElementHandlerState defaultState = ElementHandlerState.Disconnected)
+			where T : class
+			=> (handlerOrElement as IElementHandlerStateExhibitor)?.State ?? defaultState;
 
 		public static IServiceProvider GetServiceProvider(this IElementHandler handler)
 		{

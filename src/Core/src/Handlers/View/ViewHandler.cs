@@ -284,6 +284,12 @@ namespace Microsoft.Maui.Handlers
 		/// <param name="view">The associated <see cref="IView"/> instance.</param>
 		public static void MapIsEnabled(IViewHandler handler, IView view)
 		{
+			var handlerState = ElementHandlerExtensions.GetHandlerStateOrDefault(handler);
+			if (handlerState == ElementHandlerState.Connecting && view.IsEnabled)
+			{
+				return;
+			}
+
 			((PlatformView?)handler.PlatformView)?.UpdateIsEnabled(view);
 		}
 
@@ -294,6 +300,12 @@ namespace Microsoft.Maui.Handlers
 		/// <param name="view">The associated <see cref="IView"/> instance.</param>
 		public static void MapVisibility(IViewHandler handler, IView view)
 		{
+			var handlerState = ElementHandlerExtensions.GetHandlerStateOrDefault(handler);
+			if (handlerState == ElementHandlerState.Connecting && view.Visibility == Visibility.Visible)
+			{
+				return;
+			}
+
 			if (handler.HasContainer)
 				((PlatformView?)handler.ContainerView)?.UpdateVisibility(view);
 
@@ -309,6 +321,12 @@ namespace Microsoft.Maui.Handlers
 		{
 			if (handler.PlatformView is not PlatformView platformView)
 				return;
+
+			var handlerState = ElementHandlerExtensions.GetHandlerStateOrDefault(handler);
+			if (handlerState == ElementHandlerState.Connecting && view.Background is null)
+			{
+				return;
+			}
 
 			if (view.Background is ImageSourcePaint image)
 			{

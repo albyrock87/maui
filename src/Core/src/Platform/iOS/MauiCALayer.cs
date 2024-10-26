@@ -30,6 +30,8 @@ namespace Microsoft.Maui.Platform
 
 		nfloat _strokeMiterLimit;
 
+		internal bool Initialized { get; set; }
+
 		public MauiCALayer()
 		{
 			_bounds = new CGRect();

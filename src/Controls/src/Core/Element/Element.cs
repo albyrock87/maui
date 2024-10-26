@@ -46,7 +46,7 @@ namespace Microsoft.Maui.Controls
 	///			</item>
 	///		</list>
 	///</remarks>
-	public abstract partial class Element : BindableObject, IElementDefinition, INameScope, IElementController, IVisualTreeElement, Maui.IElement, IEffectControlProvider, IToolTipElement, IContextFlyoutElement, IControlsElement, IHandlerDisconnectPolicies
+	public abstract partial class Element : BindableObject, IElementDefinition, INameScope, IElementController, IVisualTreeElement, Maui.IElement, IEffectControlProvider, IToolTipElement, IContextFlyoutElement, IControlsElement, IHandlerDisconnectPolicies, IElementHandlerStateExhibitor
 	{
 		internal static readonly ReadOnlyCollection<Element> EmptyChildren = new ReadOnlyCollection<Element>(Array.Empty<Element>());
 
@@ -686,6 +686,8 @@ namespace Microsoft.Maui.Controls
 				Handler?.UpdateValue(property);
 			}
 		}
+
+		ElementHandlerState IElementHandlerStateExhibitor.State => (Handler as IElementHandlerStateExhibitor)?.State ?? ElementHandlerState.Disconnected;
 
 		internal IEnumerable<Element> Descendants() =>
 			Descendants<Element>();
