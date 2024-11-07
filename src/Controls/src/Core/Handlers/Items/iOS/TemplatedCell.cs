@@ -40,6 +40,9 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 		// Keep track of the cell size so we can verify whether a measure invalidation 
 		// actually changed the size of the cell
 		Size _size;
+		bool _needsMeasurement;
+
+		internal bool NeedsMeasurement => _needsMeasurement;
 
 		internal CGSize CurrentSize => _size.ToCGSize();
 
@@ -77,6 +80,8 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 
 		internal void Unbind()
 		{
+			_needsMeasurement = false;
+
 			if (PlatformHandler?.VirtualView is View view)
 			{
 				view.MeasureInvalidated -= MeasureInvalidated;
@@ -120,6 +125,7 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 			var nativeBounds = platformView.Frame.ToRectangle();
 			PlatformHandler.VirtualView.Arrange(nativeBounds);
 			_size = nativeBounds.Size;
+			_needsMeasurement = false;
 
 			return size;
 		}
@@ -181,18 +187,21 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 				// if we do it before, the element briefly inherits the ItemsView's bindingcontext and we 
 				// emit a bunch of needless binding errors
 				itemsView.AddLogicalChild(view);
-
 				UpdateSelectionColor(view);
+
+				_needsMeasurement = true;
+				OnContentSizeChanged();
 			}
 			else
 			{
 				// Same template
-				if (oldElement != null)
+				if (oldElement != null && !ReferenceEquals(oldElement.BindingContext, bindingContext))
 				{
 					oldElement.BindingContext = bindingContext;
 					oldElement.MeasureInvalidated += MeasureInvalidated;
 
-					UpdateCellSize();
+					_needsMeasurement = true;
+					OnContentSizeChanged();
 				}
 			}
 
@@ -231,6 +240,9 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 			CurrentTemplate = measurementCell.CurrentTemplate;
 			_size = measurementCell._size;
 			SetRenderer(measurementCell.PlatformHandler);
+
+			_needsMeasurement = true;
+			OnContentSizeChanged();
 		}
 
 		bool IsUsingVSMForSelectionColor(View view)
@@ -280,19 +292,26 @@ namespace Microsoft.Maui.Controls.Handlers.Items
 
 		protected abstract (bool, Size) NeedsContentSizeUpdate(Size currentSize);
 
-		void MeasureInvalidated(object sender, EventArgs args)
+		internal bool VerifyAndUpdateSize()
 		{
+			_needsMeasurement = false;
+
 			var (needsUpdate, toSize) = NeedsContentSizeUpdate(_size);
 
 			if (!needsUpdate)
 			{
-				return;
+				return false;
 			}
 
 			// Cache the size for next time
 			_size = toSize;
+			return true;
+		}
 
+		void MeasureInvalidated(object sender, EventArgs args)
+		{
 			// Let the controller know that things need to be arranged again
+			_needsMeasurement = true;
 			OnContentSizeChanged();
 		}
 
