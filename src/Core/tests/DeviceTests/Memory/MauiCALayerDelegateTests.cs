@@ -11,14 +11,14 @@ namespace Microsoft.Maui.DeviceTests.Memory
 {
 	// Set of tests to verify auto-sizing layers do not leak
 	[Category(TestCategory.Memory)]
-	public class CALayerAutosizeObserverTests : TestBase
+	public class MauiCALayerDelegateTests : TestBase
 	{
 		[Theory]
 		[InlineData(typeof(MauiCALayer))]
 		[InlineData(typeof(StaticCALayer))]
 		[InlineData(typeof(StaticCAGradientLayer))]
 		[InlineData(typeof(StaticCAShapeLayer))]
-		public async Task CALayerAutosizeObserver_DoesNotLeak(Type sublayerType)
+		public async Task MauiCALayerDelegate_DoesNotLeak(Type sublayerType)
 		{
 			WeakReference viewReference = null;
 			WeakReference layerReference = null;
@@ -31,12 +31,12 @@ namespace Microsoft.Maui.DeviceTests.Memory
 
 				layerReference = new(view.Layer);
 
-				var sublayer = (IAutoSizableCALayer)Activator.CreateInstance(sublayerType)!;
+				var sublayer = (CALayer)Activator.CreateInstance(sublayerType)!;
 				sublayerReference = new(sublayer);
 
-				view.Layer.AddSublayer((CALayer)sublayer);
+				MauiCALayerDelegate.EnsureAttached(view.Layer);
+				view.Layer.AddSublayer(sublayer);
 
-				sublayer.AutoSizeToSuperLayer();
 				view.Frame = new CoreGraphics.CGRect(0, 0, 100, 100);
 			});
 

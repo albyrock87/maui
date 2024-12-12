@@ -14,12 +14,12 @@ namespace Microsoft.Maui.Platform
 			{
 				var layer = control.Layer;
 
+				MauiCALayerDelegate.EnsureAttached(layer);
+
 				if (index > -1)
 					layer.InsertSublayer(backgroundLayer, index);
 				else
 					layer.AddSublayer(backgroundLayer);
-
-				(backgroundLayer as IAutoSizableCALayer)?.AutoSizeToSuperLayer();
 			}
 		}
 

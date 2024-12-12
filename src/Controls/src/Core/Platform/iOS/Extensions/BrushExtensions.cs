@@ -6,7 +6,6 @@ using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using Microsoft.Maui.Graphics;
-using ObjCRuntime;
 using UIKit;
 
 namespace Microsoft.Maui.Controls.Platform
@@ -144,12 +143,12 @@ namespace Microsoft.Maui.Controls.Platform
 
 			if (backgroundLayer != null)
 			{
+				MauiCALayerDelegate.EnsureAttached(layer);
+
 				if (index > -1)
 					layer.InsertSublayer(backgroundLayer, index);
 				else
 					layer.AddSublayer(backgroundLayer);
-
-				(backgroundLayer as IAutoSizableCALayer)?.AutoSizeToSuperLayer();
 			}
 		}
 
