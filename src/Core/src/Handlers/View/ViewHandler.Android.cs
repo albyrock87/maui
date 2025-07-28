@@ -41,8 +41,7 @@ namespace Microsoft.Maui.Handlers
 
 		static partial void MappingFrame(IViewHandler handler, IView view)
 		{
-			handler.ToPlatform().UpdateAnchorX(view);
-			handler.ToPlatform().UpdateAnchorY(view);
+			handler.ToPlatform().UpdateAnchors(view);
 		}
 
 		public static void MapTranslationX(IViewHandler handler, IView view)

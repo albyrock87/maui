@@ -7,4 +7,5 @@ import android.graphics.Path;
 public interface PlatformShadowDrawable {
     void drawShadow(Canvas canvas, Paint shadowPaint, Path outerClipPath);
     boolean canDrawShadow();
+    void platformDispose();
 }

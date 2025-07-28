@@ -66,5 +66,12 @@ namespace Microsoft.Maui.Platform
 			var pivotY = (float)(view.AnchorY * platformView.ToPixels(view.Frame.Height));
 			PlatformInterop.SetPivotYIfNeeded(platformView, pivotY);
 		}
+
+		internal static void UpdateAnchors(this AView platformView, IView view)
+		{
+			var pivotX = (float)(view.AnchorX * platformView.ToPixels(view.Frame.Width));
+			var pivotY = (float)(view.AnchorY * platformView.ToPixels(view.Frame.Height));
+			PlatformInterop.SetPivotIfNeeded(platformView, pivotX, pivotY);
+		}
 	}
 }

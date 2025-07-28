@@ -501,6 +501,8 @@ namespace Microsoft.Maui.Graphics
 			return true;
 		}
 
+		void IPlatformShadowDrawable.PlatformDispose() => Dispose();
+
 		protected override void Dispose(bool disposing)
 		{
 			if (_disposed)

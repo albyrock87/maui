@@ -53,6 +53,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import com.microsoft.maui.PlatformShadowDrawable;
 import com.microsoft.maui.glide.MauiCustomTarget;
 import com.microsoft.maui.glide.MauiCustomViewTarget;
 import com.microsoft.maui.glide.MauiTarget;
@@ -113,6 +114,11 @@ public class PlatformInterop {
             view.setPivotY(pivotY);
     }
 
+    public static void setPivotIfNeeded(View view, float pivotX, float pivotY) {
+        setPivotXIfNeeded(view, pivotX);
+        setPivotYIfNeeded(view, pivotY);
+    }
+
     public static void setContentDescriptionForAutomationId(View view, String description) {
         view = getSemanticPlatformElement(view);
 
@@ -171,6 +177,25 @@ public class PlatformInterop {
         view.setRotationY(rotationY);
         setPivotXIfNeeded(view, pivotX);
         setPivotYIfNeeded(view, pivotY);
+    }
+
+    public static void setViewBackground(View view, int mode, int color, Drawable background) {
+        // Accessing the background drawable from .NET is expensive, so this method's here to reduce the cost of updating the background
+        Drawable currentBackground = view.getBackground();
+
+        // Check whether this is a MauiDrawable, and in such case manually dispose it (calls back to C# to dispose managed resources)
+        if (currentBackground != null && currentBackground instanceof PlatformShadowDrawable) {
+            view.setBackground(null);
+            ((PlatformShadowDrawable)currentBackground).platformDispose();
+        }
+
+        if (mode == 1) {
+            view.setBackground(null);
+        } else if (mode == 2) {
+            view.setBackgroundColor((int)color);
+        } else if (mode == 3) {
+            view.setBackground(background);
+        }
     }
 
     @NonNull

@@ -11,7 +11,6 @@ using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using AndroidX.Core.Content;
 using AndroidX.Core.View;
-using Kotlin;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Primitives;
@@ -275,30 +274,42 @@ namespace Microsoft.Maui.Platform
 
 			if (!paint.IsNullOrEmpty())
 			{
-				// Remove previous background gradient if any
-				if (platformView.Background is MauiDrawable mauiDrawable)
-				{
-					platformView.Background = null;
-					mauiDrawable.Dispose();
-				}
+				// 0 => noop
+				// 1 => clear background
+				// 2 => set solid color
+				// 3 => set drawable
+				var mode = 0;
+				AColor color = AColor.Transparent;
+				Drawable? drawable = null;
 
 				if (treatTransparentAsNull && paint.IsTransparent())
 				{
 					// For controls where android treats transparent as null it's more
 					// performant to just set the background to null instead of
 					// giving it a transparent color/drawable
-					platformView.Background = null;
-				}
-				else if (paint is SolidPaint solidPaint)
-				{
-					if (solidPaint.Color is Color backgroundColor)
-						platformView.SetBackgroundColor(backgroundColor.ToPlatform());
+					mode = 1;
 				}
 				else
 				{
-					if (paint!.ToDrawable(platformView.Context) is Drawable drawable)
-						platformView.Background = drawable;
+					if (paint is SolidPaint solidPaint)
+					{
+						if (solidPaint.Color is { } backgroundColor)
+						{
+							color = backgroundColor.ToPlatform();
+							mode = 1;
+						}
+					}
+					else
+					{
+						if (paint!.ToDrawable(platformView.Context) is { } backgroundDrawable)
+						{
+							drawable = backgroundDrawable;
+							mode = 2;
+						}
+					}
 				}
+
+				PlatformInterop.SetViewBackground(platformView, mode, color, drawable);
 			}
 			else if (platformView is LayoutViewGroup)
 			{
