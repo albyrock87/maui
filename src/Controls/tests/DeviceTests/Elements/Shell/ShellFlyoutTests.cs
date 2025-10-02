@@ -278,6 +278,7 @@ namespace Microsoft.Maui.DeviceTests
 
 				var initialBox = (shell.FlyoutHeader as IView).GetBoundingBox();
 
+				await Task.Delay(10000);
 				AssertionExtensions.CloseEnough(headerRequestedHeight, initialBox.Height, 0.3);
 
 				var bottomOffset = await ScrollFlyoutToBottom(handler);

@@ -94,7 +94,7 @@ namespace Microsoft.Maui.Controls.Platform.Compatibility
 		[System.Runtime.Versioning.SupportedOSPlatform("tvos11.0")]
 		public override void ViewSafeAreaInsetsDidChange()
 		{
-			ShellFlyoutContentManager.SetHeaderContentInset();
+			ShellFlyoutContentManager.UpdateVerticalScrollMode();
 			base.ViewSafeAreaInsetsDidChange();
 		}
 
