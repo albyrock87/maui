@@ -512,6 +512,18 @@ namespace Microsoft.Maui.Platform
 		CGRect? _arrangedContentRect;
 
 		/// <summary>
+		/// Whether UIKit is compensating for the safe area through
+		/// <see cref="UIScrollView.AdjustedContentInset"/>. When it is not
+		/// (<see cref="UIScrollViewContentInsetAdjustmentBehavior.Never"/>, or a zero system
+		/// inset), <see cref="CrossPlatformArrange"/> bakes the safe area into the content's
+		/// coordinate space instead. Shared by the arrange branch and
+		/// <see cref="SafeAreaBakedIntoContent"/> so the two can never desynchronize.
+		/// </summary>
+		bool UIKitCompensatesForSafeArea =>
+			SystemAdjustedContentInset != UIEdgeInsets.Zero
+			&& ContentInsetAdjustmentBehavior != UIScrollViewContentInsetAdjustmentBehavior.Never;
+
+		/// <summary>
 		/// The safe area <see cref="CrossPlatformArrange"/> baked into the content's coordinate
 		/// space: when it applies the safe area while UIKit is not compensating through
 		/// <see cref="UIScrollView.AdjustedContentInset"/>, the content is arranged inside
@@ -519,16 +531,17 @@ namespace Microsoft.Maui.Platform
 		/// padding still obscures the viewport without ever appearing in the adjusted inset.
 		/// </summary>
 		/// <remarks>
-		/// Mirrors the arrange-side branch exactly: bounds are inset only while
-		/// <c>_appliesSafeAreaAdjustments</c>, and the inset origin is kept only when UIKit
-		/// contributes nothing (<see cref="UIScrollViewContentInsetAdjustmentBehavior.Never"/>,
-		/// or a zero system inset). In the remaining case (<see cref="UIScrollViewContentInsetAdjustmentBehavior.Always"/>)
-		/// the content is re-based at the origin and UIKit's inset owns the compensation, so the
-		/// arranged rect <see cref="ScrollableContentSize"/> measures naturally excludes it (issue #36801).
+		/// Shares <see cref="UIKitCompensatesForSafeArea"/> with the arrange branch, so the
+		/// baked state always describes what the last arrange actually did. One asymmetry is
+		/// deliberate: with <see cref="UIScrollViewContentInsetAdjustmentBehavior.Automatic"/>
+		/// on a vertical scroll view, the arrange still keeps a horizontal safe-area origin
+		/// (the landscape-notch fix, #35410) that this property does not report — that axis
+		/// cannot scroll, its extent is clamped to the frame, and the arranged-rect origin
+		/// already carries the offset for <see cref="ScrollableContentSize"/>, so reporting it
+		/// would only shift element targets on an axis whose requests clamp to rest (issue #36801).
 		/// </remarks>
 		internal SafeAreaPadding SafeAreaBakedIntoContent =>
-			_appliesSafeAreaAdjustments &&
-			(SystemAdjustedContentInset == UIEdgeInsets.Zero || ContentInsetAdjustmentBehavior == UIScrollViewContentInsetAdjustmentBehavior.Never)
+			_appliesSafeAreaAdjustments && !UIKitCompensatesForSafeArea
 				? _safeArea
 				: SafeAreaPadding.Empty;
 
@@ -630,8 +643,7 @@ namespace Microsoft.Maui.Platform
 			CGPoint contentOrigin;
 			double width;
 			double height;
-			if (SystemAdjustedContentInset != UIEdgeInsets.Zero
-				&& ContentInsetAdjustmentBehavior != UIScrollViewContentInsetAdjustmentBehavior.Never)
+			if (UIKitCompensatesForSafeArea)
 			{
 				// arrangeX = 0 when UIKit owns the horizontal edges via ACI:
 				//   - CIAB.Always: UIKit manages ALL edges
